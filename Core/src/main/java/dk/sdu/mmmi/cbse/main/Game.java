@@ -38,6 +38,7 @@ class Game {
     private final List<IEntityProcessingService> entityProcessingServiceList;
     private final List<IPostEntityProcessingService> postEntityProcessingServices;
 
+    // The Spring factory passes the discovered services into this constructor
     Game(List<IGamePluginService> gamePluginServices, List<IEntityProcessingService> entityProcessingServiceList, List<IPostEntityProcessingService> postEntityProcessingServices) {
         this.gamePluginServices = gamePluginServices;
         this.entityProcessingServiceList = entityProcessingServiceList;
@@ -51,36 +52,47 @@ class Game {
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
-            if (event.getCode().equals(KeyCode.LEFT)) {
+            // Changed LEFT arrow to 'A'
+            if (event.getCode().equals(KeyCode.A)) {
                 gameData.getKeys().setKey(GameKeys.LEFT, true);
             }
-            if (event.getCode().equals(KeyCode.RIGHT)) {
+            // Changed RIGHT arrow to 'D'
+            if (event.getCode().equals(KeyCode.D)) {
                 gameData.getKeys().setKey(GameKeys.RIGHT, true);
             }
-            if (event.getCode().equals(KeyCode.UP)) {
+            // Changed UP arrow to 'W'
+            if (event.getCode().equals(KeyCode.W)) {
                 gameData.getKeys().setKey(GameKeys.UP, true);
             }
+            // Additional BACK key to 'S'
+            if (event.getCode().equals(KeyCode.S)) {
+                gameData.getKeys().setKey(GameKeys.BACK, true);
+            }
+            // Kept SPACE for shooting
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, true);
             }
         });
         scene.setOnKeyReleased(event -> {
-            if (event.getCode().equals(KeyCode.LEFT)) {
+            // For making the game know when you let go of keys
+            if (event.getCode().equals(KeyCode.A)) {
                 gameData.getKeys().setKey(GameKeys.LEFT, false);
             }
-            if (event.getCode().equals(KeyCode.RIGHT)) {
+            if (event.getCode().equals(KeyCode.D)) {
                 gameData.getKeys().setKey(GameKeys.RIGHT, false);
             }
-            if (event.getCode().equals(KeyCode.UP)) {
+            if (event.getCode().equals(KeyCode.W)) {
                 gameData.getKeys().setKey(GameKeys.UP, false);
+            }
+            if (event.getCode().equals(KeyCode.S)) {
+                gameData.getKeys().setKey(GameKeys.BACK, false);
             }
             if (event.getCode().equals(KeyCode.SPACE)) {
                 gameData.getKeys().setKey(GameKeys.SPACE, false);
             }
-
         });
 
-        // Lookup all Game Plugins using ServiceLoader
+        // Register any loaded plugin components (like Player or Enemy)
         for (IGamePluginService iGamePlugin : getGamePluginServices()) {
             iGamePlugin.start(gameData, world);
         }

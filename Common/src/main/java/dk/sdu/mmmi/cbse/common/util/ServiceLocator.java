@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// Singleton enum - Ensures only one plugin detector is running
+
 public enum ServiceLocator {
 
     INSTANCE;
@@ -16,11 +18,15 @@ public enum ServiceLocator {
     private static final Map<Class, ServiceLoader> loadermap = new HashMap<>();
     private final ModuleLayer layer;
 
+    // The ServiceLocator allows drag and drop of modules
+    // Rather than manually adding modules to the core, this class locates them
+
     ServiceLocator() {
         try {
-            Path pluginsDir = Paths.get("plugins"); // Directory with plugins JARs
+            // Looks for the "plugins" directory
+            Path pluginsDir = Paths.get("plugins");
 
-            // Search for plugins in the plugins directory
+            // Scans "plugins" for Java modules (.jar files)
             ModuleFinder pluginsFinder = ModuleFinder.of(pluginsDir);
 
             // Find all names of all found plugin modules
@@ -31,14 +37,15 @@ public enum ServiceLocator {
                     .map(ModuleDescriptor::name)
                     .collect(Collectors.toList());
 
-            // Create configuration that will resolve plugin modules
-            // (verify that the graph of modules is correct)
+            // Checks the code inside "plugins" directory
+            // Verifies the plugins aren't missing dependencies
             Configuration pluginsConfiguration = ModuleLayer
                     .boot()
                     .configuration()
                     .resolve(pluginsFinder, ModuleFinder.of(), plugins);
 
             // Create a module layer for plugins
+            // Tells Java to load all the plugins found into the memory and lets the game interact with them
             layer = ModuleLayer
                     .boot()
                     .defineModulesWithOneLoader(pluginsConfiguration, ClassLoader.getSystemClassLoader());
@@ -49,6 +56,7 @@ public enum ServiceLocator {
     }
 
 
+    // Method acts like a search filter
     public <T> List<T> locateAll(Class<T> service) {
         ServiceLoader<T> loader = loadermap.get(service);
 

@@ -20,17 +20,26 @@ public class PlayerControlSystem implements IEntityProcessingService {
     public void process(GameData gameData, World world) {
             
         for (Entity player : world.getEntities(Player.class)) {
+            // Reduced rotation movement speed by half for smoother controls
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
-                player.setRotation(player.getRotation() - 5);                
+                player.setRotation(player.getRotation() - 2.5);
             }
             if (gameData.getKeys().isDown(GameKeys.RIGHT)) {
-                player.setRotation(player.getRotation() + 5);                
+                player.setRotation(player.getRotation() + 2.5);
             }
             if (gameData.getKeys().isDown(GameKeys.UP)) {
                 double changeX = Math.cos(Math.toRadians(player.getRotation()));
                 double changeY = Math.sin(Math.toRadians(player.getRotation()));
                 player.setX(player.getX() + changeX);
                 player.setY(player.getY() + changeY);
+            }
+            if (gameData.getKeys().isDown(GameKeys.BACK)){
+                double changeX = Math.cos(Math.toRadians(player.getRotation()));
+                double changeY = Math.sin(Math.toRadians(player.getRotation()));
+                // Subtract instead of add to move ship in reverse
+                // Halved the backwards movement speed
+                player.setX(player.getX() - changeX * 0.5);
+                player.setY(player.getY() - changeY * 0.5);
             }
             if(gameData.getKeys().isDown(GameKeys.SPACE)) {                
                 getBulletSPIs().stream().findFirst().ifPresent(

@@ -2,14 +2,17 @@ package dk.sdu.mmmi.cbse.common.data;
 
 public class GameKeys {
 
-    private static boolean[] keys;
-    private static boolean[] pkeys;
+    // Removed static
+    private boolean[] keys;
+    private boolean[] pkeys;
 
-    private static final int NUM_KEYS = 4;
+    // Added an extra slot to hold the key for backwards movement
+    private static final int NUM_KEYS = 5;
     public static final int UP = 0;
     public static final int LEFT = 1;
     public static final int RIGHT = 2;
-    public static final int SPACE = 3;
+    public static final int BACK = 3;
+    public static final int SPACE = 4;
 
     public GameKeys() {
         keys = new boolean[NUM_KEYS];

@@ -14,13 +14,15 @@ public class Main extends Application {
 
     @Override
     public void start(Stage window) throws Exception {
-        
+
+        // Spins up my local configuration factory
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(ModuleConfig.class);
 
         for (String beanName : ctx.getBeanDefinitionNames()) {
             System.out.println(beanName);
         }
-        
+
+        // Gets my customized Game engine bean from the factory
         Game game = ctx.getBean(Game.class);
         game.start(window);
         game.render();        

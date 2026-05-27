@@ -6,12 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- *
- * @author jcs
- */
 public class World {
 
+    // Thread safe way to hold all the entities in the game
     private final Map<String, Entity> entityMap = new ConcurrentHashMap<>();
 
     public String addEntity(Entity entity) {
@@ -27,24 +24,28 @@ public class World {
         entityMap.remove(entity.getID());
     }
 
+    // Returns a list of every entity in the game
     public Collection<Entity> getEntities() {
         return entityMap.values();
     }
 
-    public <E extends Entity> List<Entity> getEntities(Class<E>... entityTypes) {
-        List<Entity> r = new ArrayList<>();
+    // A filter. Lets me ask it for specific things, like getEntities(Asteroid.class)
+    public final <E extends Entity> List<Entity> getEntities(Class<E>... entityTypes) {
+        List<Entity> filteredList = new ArrayList<>();
+
+        // Goes through every entity in the game
         for (Entity e : getEntities()) {
+            // Looking for specific needed entity
             for (Class<E> entityType : entityTypes) {
                 if (entityType.equals(e.getClass())) {
-                    r.add(e);
+                    filteredList.add(e);
                 }
             }
         }
-        return r;
+        return filteredList;
     }
 
     public Entity getEntity(String ID) {
         return entityMap.get(ID);
     }
-
 }
