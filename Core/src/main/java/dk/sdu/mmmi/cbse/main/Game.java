@@ -24,17 +24,18 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import javafx.scene.text.Font;
+import java.io.InputStream;
 
-/**
- *
- * @author jcs
- */
+
 class Game {
 
     private final GameData gameData = new GameData();
     private final World world = new World();
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
+    private final Text gameOverText = new Text();
+
     private final List<IGamePluginService> gamePluginServices;
     private final List<IEntityProcessingService> entityProcessingServiceList;
     private final List<IPostEntityProcessingService> postEntityProcessingServices;
@@ -47,9 +48,52 @@ class Game {
     }
 
     public void start(Stage window) throws Exception {
-        Text text = new Text(10, 20, "Destroyed asteroids: 0");
+        Text scoreText = new Text(10, 25, "Destroyed asteroids: 0");
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        gameWindow.getChildren().add(text);
+        gameWindow.getChildren().add(scoreText);
+
+        // Game over text appearance
+        gameOverText.setX(gameData.getDisplayWidth() / 2.0 - 100);
+        gameOverText.setY(gameData.getDisplayHeight() / 2.0);
+        gameOverText.setFill(Color.DARKRED);
+        gameOverText.setStroke(Color.BLACK);
+        gameOverText.setStrokeWidth(2);
+
+
+        // Loading score text font
+        try {
+            InputStream scoreFontStream = getClass().getResourceAsStream("/fonts/RetroGaming.ttf");
+            if (scoreFontStream != null) {
+                // Load scoreText font at size 16px
+                Font scoreFont = Font.loadFont(scoreFontStream, 16);
+                scoreText.setFont(scoreFont);
+            } else {
+                System.err.println("[FONT WARNING]: Could not find designated font for score. Defaulting to fallback.");
+                scoreText.setStyle("-fx-font-size: 14px; -fx-font-weight: bold;");
+            }
+        } catch (Exception e) {
+            System.err.println("[FONT ERROR]: Failed to load designated scoreText font.");
+            e.printStackTrace();
+        }
+
+        // Loading game over font
+        try {
+            InputStream gameOverFontStream = getClass().getResourceAsStream("/fonts/OptimusPrinceps.ttf");
+            if (gameOverFontStream != null) {
+                // Load scoreText font at size 42px
+                Font gameOverFont = Font.loadFont(gameOverFontStream, 42);
+                gameOverText.setFont(gameOverFont);
+            } else {
+                System.err.println("[FONT WARNING]: Could not find designated font for game over text. Defaulting to fallback.");
+                gameOverText.setStyle("-fx-font-size: 36px; -fx-font-weight: bold;");
+            }
+        } catch (Exception e) {
+            System.err.println("[FONT ERROR]: Failed to load designated gameOverText font.");
+            e.printStackTrace();
+        }
+
+        // Add the game over text to window canvas
+        gameWindow.getChildren().add(gameOverText);
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -131,6 +175,13 @@ class Game {
     private void draw() {
         for (Entity polygonEntity : polygons.keySet()) {
             if (!world.getEntities().contains(polygonEntity)) {
+
+                // Catching player ship death
+                if (polygonEntity.getClass().getSimpleName().equalsIgnoreCase("Player")){
+                    System.out.println("\n [GAME NOTICE]: Player entity was removed from the world!");
+                    gameOverText.setText("YOU DIED");
+                }
+
                 Polygon removedPolygon = polygons.get(polygonEntity);
                 polygons.remove(polygonEntity);
                 gameWindow.getChildren().remove(removedPolygon);

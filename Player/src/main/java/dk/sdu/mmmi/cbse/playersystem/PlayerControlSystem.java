@@ -16,6 +16,10 @@ import static java.util.stream.Collectors.toList;
 
 public class PlayerControlSystem implements IEntityProcessingService {
 
+    // Adding field to hold visual thruster
+    // Not creating new module due to dependency issues
+    private Entity thruster = null;
+
     @Override
     public void process(GameData gameData, World world) {
             
@@ -45,6 +49,12 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 getBulletSPIs().stream().findFirst().ifPresent(
                         spi -> {world.addEntity(spi.createBullet(player, gameData));}
                 );
+
+                // Adding recoil when firing
+                double changeX = Math.cos(Math.toRadians(player.getRotation()));
+                double changeY = Math.sin(Math.toRadians(player.getRotation()));
+                player.setX(player.getX() - changeX * 0.15);
+                player.setY(player.getY() - changeY * 0.15);
             }
             
         if (player.getX() < 0) {
@@ -63,6 +73,39 @@ public class PlayerControlSystem implements IEntityProcessingService {
             player.setY(gameData.getDisplayHeight()-1);
         }
 
+            // Adding thruster when player moves forward
+            if (gameData.getKeys().isDown(GameKeys.UP)) {
+
+                // Creating thruster
+                if (thruster == null) {
+                    thruster = new Entity() {};
+
+                    thruster.setPolygonCoordinates(6, -3, -6, 0, 6, 3);
+                    thruster.setColor("#FF4500"); // Orange-Red
+
+                    // Removing thruster radius to avoid collision
+                    thruster.setRadius(0);
+
+                    world.addEntity(thruster);
+                }
+
+                double changeX = Math.cos(Math.toRadians(player.getRotation()));
+                double changeY = Math.sin(Math.toRadians(player.getRotation()));
+
+                // Moving thruster's center point outside player radius
+                double distanceBehindPlayer = player.getRadius() + 7.5;
+
+                thruster.setX(player.getX() - changeX * distanceBehindPlayer);
+                thruster.setY(player.getY() - changeY * distanceBehindPlayer);
+                thruster.setRotation(player.getRotation());
+
+            } else {
+                // Removes thruster when player stops pressing 'W'
+                if (thruster != null) {
+                    world.removeEntity(thruster);
+                    thruster = null;
+                }
+            }
                                         
         }
     }

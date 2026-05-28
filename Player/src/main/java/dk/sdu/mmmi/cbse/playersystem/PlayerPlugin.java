@@ -29,8 +29,8 @@ public class PlayerPlugin implements IGamePluginService {
         // New cooler complex player geometry
         // Array holder for player ship geometry
         double[] myCoordinates = new double[]{
-                10,0, 9,1, 7,2, 3,2, 0,6, -5,6, -3,5, -2,3, -2,2, -5,2, -5,1, -7,2,
-                -7,-2, -5,-1, -5,-2, -2,-2, -2,-3, -3,-5, -5,-6, 0,-6, 3,-2, 7,-2, 9,-1
+                8.5,0,   7.5,1,   5.5,2,   1.5,2,   -1.5,6,  -6.5,6,  -4.5,5,  -3.5,3,  -3.5,2,  -6.5,2,  -6.5,1,  -8.5,2,
+                -8.5,-2, -6.5,-1, -6.5,-2, -3.5,-2, -3.5,-3, -4.5,-5, -6.5,-6, -1.5,-6, 1.5,-2,  5.5,-2,  7.5,-1
         };
 
         // Setting a scaling factor and applying to geometry
@@ -42,8 +42,8 @@ public class PlayerPlugin implements IGamePluginService {
         // Is handed the upscaled coordinates
         playerShip.setPolygonCoordinates(myCoordinates);
 
-        playerShip.setX(gameData.getDisplayHeight()/2);
-        playerShip.setY(gameData.getDisplayWidth()/2);
+        playerShip.setX(gameData.getDisplayWidth() / 2);
+        playerShip.setY(gameData.getDisplayHeight() / 2);
 
         // Increases radius of player ship according to scale
         // Adjust between a radius of 9 or 10 depending on feel
