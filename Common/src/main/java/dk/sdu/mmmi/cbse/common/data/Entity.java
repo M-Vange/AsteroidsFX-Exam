@@ -12,6 +12,10 @@ public class Entity implements Serializable {
     private double y;
     private double rotation;
 
+    // Adding ability to add color to entities
+    private String color = "BLACK"; // Default fallback color
+
+
     // Variable for holding the wireframe shape of objects
     private double[] polygonCoordinates;
 
@@ -36,6 +40,15 @@ public class Entity implements Serializable {
     public void setRadius(float radius) { this.radius = radius; }
 
     public double[] getPolygonCoordinates() { return polygonCoordinates; }
+
+    // Getter and setter for color names
+    public String getColor() {
+        return color;
+    }
+    public void setColor(String color) {
+        // Accepts standard web color names ie. "RED", "DARKORANGE", "AQUA"
+        this.color = color;
+    }
 
     // "..." is a Varargs aka variable argument. Packages the arguments handed into an array
     public void setPolygonCoordinates(double... coordinates) {
