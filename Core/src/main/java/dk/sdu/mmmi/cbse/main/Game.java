@@ -19,6 +19,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -138,16 +139,43 @@ class Game {
 
         for (Entity entity : world.getEntities()) {
             Polygon polygon = polygons.get(entity);
+
             if (polygon == null) {
-                polygon = new Polygon(entity.getPolygonCoordinates());
-                polygons.put(entity, polygon);
-                gameWindow.getChildren().add(polygon);
+                // Implementing try-catch due to disappearing player ship
+                try {
+                    polygon = new Polygon(entity.getPolygonCoordinates());
+                    polygons.put(entity, polygon);
+                    gameWindow.getChildren().add(polygon);
+                } catch (Exception e) {
+                        System.err.println("--- DIAGNOSTIC ERROR: Could not create Polygon for " + entity.getClass().getSimpleName() + " ---");
+                        e.printStackTrace();
+                        continue;
+                    }
             }
+
+            try {
+                // Try-catch to apply an entity's color
+                // Reading color string for entities and paints the polygon fill specified color
+                polygon.setFill(javafx.scene.paint.Color.valueOf(entity.getColor()));
+                // Adding border color to polygons
+                polygon.setStroke(javafx.scene.paint.Color.DARKGREY);
+            } catch (Exception e) {
+                System.err.println("--- DIAGNOSTIC ERROR: Color failed for " + entity.getClass().getSimpleName() + " with value [" + entity.getColor() + "] ---");
+                e.printStackTrace();
+                // Fallback color to avoid crashing
+                polygon.setFill(javafx.scene.paint.Color.BLACK);
+            }
+
+            // Reading color string for entities and paints the polygon fill specified color
+            //polygon.setFill(javafx.scene.paint.Color.valueOf(entity.getColor()));
+
+            // Adding border color to polygons
+            //polygon.setStroke(javafx.scene.paint.Color.DARKGREY);
+
             polygon.setTranslateX(entity.getX());
             polygon.setTranslateY(entity.getY());
             polygon.setRotate(entity.getRotation());
         }
-
     }
 
     public List<IGamePluginService> getGamePluginServices() {
