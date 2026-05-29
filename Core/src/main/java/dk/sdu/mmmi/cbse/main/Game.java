@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dk.sdu.mmmi.cbse.main;
 
 import dk.sdu.mmmi.cbse.common.data.Entity;
@@ -23,10 +19,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import javafx.scene.text.Font;
 import java.io.InputStream;
-
+import dk.sdu.mmmi.cbse.common.util.ServiceLocator;
 
 class Game {
 
@@ -36,16 +31,10 @@ class Game {
     private final Pane gameWindow = new Pane();
     private final Text gameOverText = new Text();
 
-    private final List<IGamePluginService> gamePluginServices;
-    private final List<IEntityProcessingService> entityProcessingServiceList;
-    private final List<IPostEntityProcessingService> postEntityProcessingServices;
-
-    // The Spring factory passes the discovered services into this constructor
-    Game(List<IGamePluginService> gamePluginServices, List<IEntityProcessingService> entityProcessingServiceList, List<IPostEntityProcessingService> postEntityProcessingServices) {
-        this.gamePluginServices = gamePluginServices;
-        this.entityProcessingServiceList = entityProcessingServiceList;
-        this.postEntityProcessingServices = postEntityProcessingServices;
-    }
+    // ServiceLocator pulls fields dynamically
+   public Game(){
+       // Left empty. Initialization happens in start()
+   }
 
     public void start(Stage window) throws Exception {
         Text scoreText = new Text(10, 25, "Destroyed asteroids: 0");
@@ -230,15 +219,18 @@ class Game {
     }
 
     public List<IGamePluginService> getGamePluginServices() {
-        return gamePluginServices;
+       // Automatically looks inside "mods-mvn" folder for game setups
+       return ServiceLocator.INSTANCE.locateAll(IGamePluginService.class);
     }
 
     public List<IEntityProcessingService> getEntityProcessingServices() {
-        return entityProcessingServiceList;
+        // Automatically looks inside "mods-mvn" folder for movement/enemy movement
+       return ServiceLocator.INSTANCE.locateAll(IEntityProcessingService.class);
     }
 
     public List<IPostEntityProcessingService> getPostEntityProcessingServices() {
-        return postEntityProcessingServices;
+        // Automatically looks inside "mods-mvn" folder for clean-up/collision
+       return ServiceLocator.INSTANCE.locateAll(IPostEntityProcessingService.class);
     }
 
 }
