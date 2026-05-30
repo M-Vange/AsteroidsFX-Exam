@@ -34,22 +34,24 @@ public class BulletControlSystem implements IEntityProcessingService, BulletSPI 
     public Entity createBullet(Entity shooter, GameData gameData) {
         Entity bullet = new Bullet();
         // Altered bullet geometry
-        bullet.setPolygonCoordinates(1.5,0, 1,0.5, 1,1, 0.5,1, 0,1.5, -0.5,1, -1,1, -1,0.5, -1.5,0,
-                -1,-0.5, -1,-1, -0.5,-1, 0,-1.5, 0.5,-1, 1,-1, 1,-0.5);
+        // Upscaled by 2.5x to make them chunkier
+        bullet.setPolygonCoordinates(3.75,0, 2.5,1.25, 2.5,2.5, 1.25,2.5, 0,3.75, -1.25,2.5, -2.5,2.5, -2.5,1.25,
+                -3.75,0, -2.5,-1.25, -2.5,-2.5, -1.25,-2.5, 0,-3.75, 1.25,-2.5, 2.5,-2.5, 2.5,-1.25);
 
         double changeX = Math.cos(Math.toRadians(shooter.getRotation()));
         double changeY = Math.sin(Math.toRadians(shooter.getRotation()));
 
         // Implemented due to suicide bullets spawning inside player ship radius
-        // Dynamically spawn bullets outside of the shooter's radius
-        double spawnDistance = shooter.getRadius() + 2;
+        // Dynamically spawn bullets outside the shooter's radius
+        double spawnDistance = shooter.getRadius() + 4.0;
 
         // Replaced hardcoded value with spawnDistance
         bullet.setX(shooter.getX() + changeX * spawnDistance);
         bullet.setY(shooter.getY() + changeY * spawnDistance);
-
         bullet.setRotation(shooter.getRotation());
-        bullet.setRadius(1.5F);
+
+        // Increased radius to match updated geometry
+        bullet.setRadius(3.5F);
         return bullet;
     }
 }

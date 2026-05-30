@@ -8,10 +8,16 @@
     </parent>
     <artifactId>Collision</artifactId>
     <packaging>jar</packaging>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>CommonAsteroids</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
