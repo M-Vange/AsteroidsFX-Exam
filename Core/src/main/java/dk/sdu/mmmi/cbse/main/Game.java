@@ -18,6 +18,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ class Game {
     private final Map<Entity, Polygon> polygons = new ConcurrentHashMap<>();
     private final Pane gameWindow = new Pane();
     private final Text gameOverText = new Text();
+    private final Text restartText = new Text();
 
     // ServiceLocator pulls fields dynamically
    public Game(){
@@ -42,11 +44,22 @@ class Game {
         gameWindow.getChildren().add(scoreText);
 
         // Game over text appearance
-        gameOverText.setX(gameData.getDisplayWidth() / 2.0 - 100);
+        gameOverText.setX(0);
         gameOverText.setY(gameData.getDisplayHeight() / 2.0);
+        gameOverText.setWrappingWidth(gameData.getDisplayWidth());
+        gameOverText.setTextAlignment(TextAlignment.CENTER);
         gameOverText.setFill(Color.DARKRED);
         gameOverText.setStroke(Color.BLACK);
         gameOverText.setStrokeWidth(2);
+
+        // Restart text appearance
+        restartText.setX(0);
+        restartText.setY(gameData.getDisplayHeight() / 2.0 + 40);
+        restartText.setWrappingWidth(gameData.getDisplayWidth());
+        restartText.setTextAlignment(TextAlignment.CENTER);
+        restartText.setFill(Color.DARKRED);
+        restartText.setStroke(Color.BLACK);
+        restartText.setStrokeWidth(1.2);
 
 
         // Loading score text font
@@ -81,8 +94,24 @@ class Game {
             e.printStackTrace();
         }
 
+        // Loading restart font
+        try {
+            InputStream restartFontStream = getClass().getResourceAsStream("/fonts/OptimusPrinceps.ttf");
+            if (restartFontStream != null) {
+                Font restartFont = Font.loadFont(restartFontStream, 20);
+                restartText.setFont(restartFont);
+            } else {
+                System.err.println("[FONT WARNING]: Could not find designated font for restart text. Defaulting to fallback.");
+                restartText.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+            }
+        } catch (Exception e) {
+            System.err.println("[FONT ERROR]: Failed to load designated restartText font.");
+            e.printStackTrace();
+        }
+
         // Add the game over text to window canvas
         gameWindow.getChildren().add(gameOverText);
+        gameWindow.getChildren().add(restartText);
 
         Scene scene = new Scene(gameWindow);
         scene.setOnKeyPressed(event -> {
@@ -153,11 +182,41 @@ class Game {
     }
 
     private void update() {
-        for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
+       // Intercepting game loop if player is dead. Hit space to restart
+       if ("YOU DIED".equals(gameOverText.getText()) && gameData.getKeys().isDown(GameKeys.SPACE)) {
+           restartGame();
+           return;
+       }
+
+       for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
             entityProcessorService.process(gameData, world);
         }
         for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
             postEntityProcessorService.process(gameData, world);
+        }
+    }
+
+    // Engine reboot implementation
+    private void restartGame() {
+       // Wipe text descriptors
+        gameOverText.setText("");
+        restartText.setText("");
+
+        // Remove all active entity polygons from JavaFX canvas
+        for (Polygon polygon : polygons.values()) {
+            gameWindow.getChildren().remove(polygon);
+        }
+        polygons.clear();
+
+        // Clear core world for entities
+        List<Entity> activeEntities = new java.util.ArrayList<>(world.getEntities());
+        for (Entity e : activeEntities) {
+            world.removeEntity(e);
+        }
+
+        // Start plugins again to respawn player, enemies, etc.
+        for (IGamePluginService iGamePlugin : getGamePluginServices()) {
+            iGamePlugin.start(gameData, world);
         }
     }
 
@@ -169,6 +228,7 @@ class Game {
                 if (polygonEntity.getClass().getSimpleName().equalsIgnoreCase("Player")){
                     System.out.println("\n [GAME NOTICE]: Player entity was removed from the world!");
                     gameOverText.setText("YOU DIED");
+                    restartText.setText("Press Space to Restart");
                 }
 
                 Polygon removedPolygon = polygons.get(polygonEntity);
