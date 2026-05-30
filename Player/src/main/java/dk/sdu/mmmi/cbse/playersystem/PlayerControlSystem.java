@@ -20,10 +20,22 @@ public class PlayerControlSystem implements IEntityProcessingService {
     // Not creating new module due to dependency issues
     private Entity thruster = null;
 
+    // Gun cooldown. Tracks frame between designated shots
+    private int shootCooldown = 0;
+
+    // Small custom entity class for showing player health in window
+    private static class HealthIcon extends Entity {}
+
     @Override
     public void process(GameData gameData, World world) {
             
         for (Entity player : world.getEntities(Player.class)) {
+
+            // Decrease gun cooldown every frame
+            if (shootCooldown > 0) {
+                shootCooldown--;
+            }
+
             // Reduced rotation movement speed by half for smoother controls
             if (gameData.getKeys().isDown(GameKeys.LEFT)) {
                 player.setRotation(player.getRotation() - 2.5);
@@ -45,16 +57,43 @@ public class PlayerControlSystem implements IEntityProcessingService {
                 player.setX(player.getX() - changeX * 0.5);
                 player.setY(player.getY() - changeY * 0.5);
             }
-            if(gameData.getKeys().isDown(GameKeys.SPACE)) {                
+            // Added shootCooldown condition to counteract bullet spam
+            if(gameData.getKeys().isDown(GameKeys.SPACE) && shootCooldown == 0) {
                 getBulletSPIs().stream().findFirst().ifPresent(
                         spi -> {world.addEntity(spi.createBullet(player, gameData));}
                 );
+
+                // Set timer for shots. 15 frames = 0.25 seconds between shots
+                shootCooldown = 15;
 
                 // Adding recoil when firing
                 double changeX = Math.cos(Math.toRadians(player.getRotation()));
                 double changeY = Math.sin(Math.toRadians(player.getRotation()));
                 player.setX(player.getX() - changeX * 0.15);
                 player.setY(player.getY() - changeY * 0.15);
+            }
+
+            // Player health ui logic
+            // Remove lost health icons
+            for (Entity oldIcon : world.getEntities(HealthIcon.class)) {
+                world.removeEntity(oldIcon);
+            }
+
+            // Rendering green diamond player health icons
+            int currentHealth = player.getHealth();
+            for (int i = 0; i < currentHealth; i++) {
+                Entity heart = new HealthIcon();
+                // Drawing diamond health geometry
+                heart.setPolygonCoordinates(0,9, 7,0, 0,-9, -7,0);
+                heart.setColor("MEDIUMSPRINGGREEN");
+                // Setting radius to 0 so entities don't crash into the UI
+                heart.setRadius(0);
+
+                // Place health ui in top left corner of window
+                heart.setX(25 + (i * 22));
+                heart.setY(55);
+
+                world.addEntity(heart);
             }
             
         if (player.getX() < 0) {

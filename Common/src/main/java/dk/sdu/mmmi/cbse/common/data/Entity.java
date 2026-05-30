@@ -22,6 +22,9 @@ public class Entity implements Serializable {
     // Collision radius. Circle around objects for hit detection
     private float radius;
 
+    // Variable for entity health
+    private int health = 3;
+
 
     public String getID() {
         return id.toString();
@@ -53,5 +56,15 @@ public class Entity implements Serializable {
     // "..." is a Varargs aka variable argument. Packages the arguments handed into an array
     public void setPolygonCoordinates(double... coordinates) {
         this.polygonCoordinates = coordinates;
+    }
+
+    // Getter and setter for entity health
+    public int getHealth() {
+        return this.health;
+    }
+
+    public void setHealth(int health) {
+        // Ensuring health doesn't drop below 0
+        this.health = Math.max(0, health);
     }
 }

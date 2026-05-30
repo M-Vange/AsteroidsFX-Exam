@@ -50,8 +50,25 @@ public class CollisionDetector implements IPostEntityProcessingService {
                     if (type1.contains("bullet") && (type2.contains("player") || type2.contains("enemy"))) {
                         // Destroy bullet
                         world.removeEntity(entity1);
-                        // Destroy ship
-                        world.removeEntity(entity2);
+
+                        // Subtract 1 health from the ship that got hit
+                        int remainingHealth = entity2.getHealth() - 1;
+                        entity2.setHealth(remainingHealth);
+
+                        // Change / fade enemy color as they lose health
+                        if (type2.contains("enemy")){
+                            if (remainingHealth == 2) {
+                                entity2.setColor("#993D3D");
+                            }
+                            else if (remainingHealth == 1) {
+                                entity2.setColor("#552B2B");
+                            }
+                        }
+
+                        // Destroy ship if it's run out of health
+                        if (entity2.getHealth() <= 0){
+                            world.removeEntity(entity2);
+                        }
                     }
                 }
             }
