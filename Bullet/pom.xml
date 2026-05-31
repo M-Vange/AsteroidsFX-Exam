@@ -8,6 +8,12 @@
     </parent>
     <artifactId>Bullet</artifactId>
     <packaging>jar</packaging>
+
+    <properties>
+        <!-- This is a plugin module, goes to plugins/ not mods-mvn/ -->
+        <plugin.output.dir>../plugins</plugin.output.dir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
