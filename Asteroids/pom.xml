@@ -8,8 +8,13 @@
     </parent>
     <artifactId>Asteroids</artifactId>
     <packaging>jar</packaging>
+
+    <!-- No plugin.output.dir override — goes to mods-mvn -->
+    <!-- Asteroids stays in boot layer because Collision depends on its -->
+    <!-- IAsteroidSplitter service at runtime to split/destroy asteroids -->
+
     <dependencies>
-            <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>Common</artifactId>
             <version>${project.version}</version>
@@ -18,34 +23,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>CommonAsteroids</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
-        </dependency>        
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-expression</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jcl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
         </dependency>
     </dependencies>
 </project>

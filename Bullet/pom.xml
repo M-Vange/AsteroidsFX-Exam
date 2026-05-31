@@ -8,6 +8,11 @@
     </parent>
     <artifactId>Bullet</artifactId>
     <packaging>jar</packaging>
+
+    <!-- No plugin.output.dir override here — inherits ../mods-mvn from root pom -->
+    <!-- Bullet stays in mods-mvn because Player and Enemy depend on its BulletSPI -->
+    <!-- implementation being visible from the boot layer -->
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

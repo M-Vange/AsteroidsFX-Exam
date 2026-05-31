@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
@@ -22,7 +21,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import java.io.InputStream;
-import dk.sdu.mmmi.cbse.common.util.ServiceLocator;
 
 class Game {
 
@@ -33,10 +31,17 @@ class Game {
     private final Text gameOverText = new Text();
     private final Text restartText = new Text();
 
-    // ServiceLocator pulls fields dynamically
-   public Game(){
-       // Left empty. Initialization happens in start()
-   }
+    private final List<IGamePluginService> gamePluginServices;
+    private final List<IEntityProcessingService> entityProcessingServices;
+    private final List<IPostEntityProcessingService> postEntityProcessingServices;
+
+    public Game(List<IGamePluginService> gamePluginServices,
+                List<IEntityProcessingService> entityProcessingServices,
+                List<IPostEntityProcessingService> postEntityProcessingServices) {
+        this.gamePluginServices = gamePluginServices;
+        this.entityProcessingServices = entityProcessingServices;
+        this.postEntityProcessingServices = postEntityProcessingServices;
+    }
 
     public void start(Stage window) throws Exception {
         Text scoreText = new Text(10, 25, "Destroyed asteroids: 0");
@@ -279,18 +284,18 @@ class Game {
     }
 
     public List<IGamePluginService> getGamePluginServices() {
-       // Automatically looks inside "mods-mvn" folder for game setups
-       return ServiceLocator.INSTANCE.locateAll(IGamePluginService.class);
+        // Returns services loaded by Main.java from both boot layer and plugins/ folder
+        return gamePluginServices;
     }
 
     public List<IEntityProcessingService> getEntityProcessingServices() {
-        // Automatically looks inside "mods-mvn" folder for movement/enemy movement
-       return ServiceLocator.INSTANCE.locateAll(IEntityProcessingService.class);
+        // Returns services loaded by Main.java from both boot layer and plugins/ folder
+        return entityProcessingServices;
     }
 
     public List<IPostEntityProcessingService> getPostEntityProcessingServices() {
-        // Automatically looks inside "mods-mvn" folder for clean-up/collision
-       return ServiceLocator.INSTANCE.locateAll(IPostEntityProcessingService.class);
+        // Returns services loaded by Main.java from both boot layer and plugins/ folder
+        return postEntityProcessingServices;
     }
 
 }
