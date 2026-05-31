@@ -7,6 +7,8 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.services.IEntityProcessingService;
 import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -279,18 +281,47 @@ class Game {
     }
 
     public List<IGamePluginService> getGamePluginServices() {
-       // Automatically looks inside "mods-mvn" folder for game setups
-       return ServiceLocator.INSTANCE.locateAll(IGamePluginService.class);
+       List<IGamePluginService> services = new ArrayList<>();
+
+       // Grab any standard services in main boot layer
+        services.addAll(ServiceLocator.INSTANCE.locateAll(IGamePluginService.class));
+
+        // Loop through custom child layers created in Main.java
+        for (ModuleLayer layer : Main.pluginLayers) {
+            // Use ServiceLoader to look inside layer for implementations
+            java.util.ServiceLoader.load(layer, IGamePluginService.class).forEach(services::add);
+        }
+        return services;
     }
 
     public List<IEntityProcessingService> getEntityProcessingServices() {
-        // Automatically looks inside "mods-mvn" folder for movement/enemy movement
-       return ServiceLocator.INSTANCE.locateAll(IEntityProcessingService.class);
+        List<IEntityProcessingService> services = new ArrayList<>();
+
+        // Grab baseline services in main boot layer
+        services.addAll(ServiceLocator.INSTANCE.locateAll(IEntityProcessingService.class));
+
+        // Loop through custom child layers created in Main.java
+        for (ModuleLayer layer : Main.pluginLayers) {
+            // Gets the movement/processing from each custom layer
+            java.util.ServiceLoader.load(layer, IEntityProcessingService.class)
+                    .forEach(services::add);
+        }
+        return services;
     }
 
     public List<IPostEntityProcessingService> getPostEntityProcessingServices() {
-        // Automatically looks inside "mods-mvn" folder for clean-up/collision
-       return ServiceLocator.INSTANCE.locateAll(IPostEntityProcessingService.class);
+        List<IPostEntityProcessingService> services = new ArrayList<>();
+
+        // Grab baseline cleanup/collision services in main boot layer
+        services.addAll(ServiceLocator.INSTANCE.locateAll(IPostEntityProcessingService.class));
+
+        // Loop through custom child layers created in Main.java
+        for (ModuleLayer layer : Main.pluginLayers) {
+            // Gets collision systems from each custom layer
+            java.util.ServiceLoader.load(layer, IPostEntityProcessingService.class)
+                    .forEach(services::add);
+        }
+        return services;
     }
 
 }

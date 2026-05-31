@@ -9,6 +9,9 @@
     <artifactId>Player</artifactId>
     <packaging>jar</packaging>
     <name>Player</name>
+    <properties>
+        <copy.folder>plugins</copy.folder>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

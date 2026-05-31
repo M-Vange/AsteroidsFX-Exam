@@ -8,7 +8,9 @@
     </parent>
     <artifactId>Collision</artifactId>
     <packaging>jar</packaging>
-
+    <properties>
+        <copy.folder>plugins</copy.folder>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

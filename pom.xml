@@ -23,12 +23,13 @@
     </modules>
     <properties>
         <java>java</java>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
         <spring.version>6.1.3</spring.version>
+        <copy.folder>mods-mvn</copy.folder>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -60,7 +61,7 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
                 <version>${spring.version}</version>
-            </dependency>        
+            </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
@@ -87,12 +88,22 @@
                 <version>${spring.version}</version>
             </dependency>
         </dependencies>
-    </dependencyManagement>    
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.2.0</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>mods-mvn</directory>
+                        </fileset>
+                        <fileset>
+                            <directory>plugins</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -101,11 +112,10 @@
                     <fork>true</fork>
                 </configuration>
             </plugin>
-            <!-- execute the resulting project -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version> 3.5.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <goals>
@@ -119,16 +129,9 @@
                     <arguments>
                         <argument>--module-path=mods-mvn</argument>
                         <argument>--class-path=libs/*</argument>
-
-                        <!-- because spark.core is an automatic module and actually required,
-                        monitor.observer.zero would be resolved as well and does not need
-                        to be added explicitly;
-                        I still wanted to do it for clarity, but for some reason that results
-                        in "java.lang.module.FindException: Module monitor.observer.zero not found";
-                        strange... -->
-                        <!--                        <argument>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=127.0.0.1:8000</argument>-->
                         <argument>--module=Core/dk.sdu.mmmi.cbse.main.Main</argument>
-                        <argument>--add-modules javafx.graphics</argument>
+                        <argument>--add-modules</argument>
+                        <argument>javafx.graphics,ALL-MODULE-PATH</argument>
                     </arguments>
                 </configuration>
             </plugin>
@@ -137,7 +140,6 @@
 
     <profiles>
         <profile>
-            <!-- parent project should delete 'mods-mvn' -->
             <id>parent-project</id>
             <activation>
                 <file>
@@ -157,6 +159,9 @@
                                 <fileset>
                                     <directory>libs</directory>
                                 </fileset>
+                                <fileset>
+                                    <directory>plugins</directory>
+                                </fileset>
                             </filesets>
                         </configuration>
                     </plugin>
@@ -164,7 +169,6 @@
             </build>
         </profile>
         <profile>
-            <!-- child projects should copy artifact into 'mods-mvn' -->
             <id>child-project</id>
             <activation>
                 <file>
@@ -192,7 +196,7 @@
                                             <type>jar</type>
                                         </artifactItem>
                                     </artifactItems>
-                                    <outputDirectory>../mods-mvn</outputDirectory>
+                                    <outputDirectory>../${copy.folder}</outputDirectory>
                                 </configuration>
                             </execution>
                         </executions>
