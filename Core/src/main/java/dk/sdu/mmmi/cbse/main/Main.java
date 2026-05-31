@@ -46,9 +46,21 @@ public class Main extends Application {
 
                 ModuleLayer layer = createLayer(jarPath);
 
-                ServiceLoader.load(layer, IGamePluginService.class).forEach(plugins::add);
-                ServiceLoader.load(layer, IEntityProcessingService.class).forEach(processors::add);
-                ServiceLoader.load(layer, IPostEntityProcessingService.class).forEach(postProcessors::add);
+
+                // Filtering by layer. Without it, it'd add boot layer services ie. Bullet once per plugin
+                // This caused bullets to move N times faster, with N being the number of plugins traversed
+                ServiceLoader.load(layer, IGamePluginService.class).stream()
+                        .filter(p -> p.type().getModule().getLayer() == layer)
+                        .map(ServiceLoader.Provider::get)
+                        .forEach(plugins::add);
+                ServiceLoader.load(layer, IEntityProcessingService.class).stream()
+                        .filter(p -> p.type().getModule().getLayer() == layer)
+                        .map(ServiceLoader.Provider::get)
+                        .forEach(processors::add);
+                ServiceLoader.load(layer, IPostEntityProcessingService.class).stream()
+                        .filter(p -> p.type().getModule().getLayer() == layer)
+                        .map(ServiceLoader.Provider::get)
+                        .forEach(postProcessors::add);
             });
         }
 

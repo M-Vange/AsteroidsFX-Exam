@@ -9,10 +9,9 @@
     <artifactId>Bullet</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <!-- This is a plugin module, goes to plugins/ not mods-mvn/ -->
-        <plugin.output.dir>../plugins</plugin.output.dir>
-    </properties>
+    <!-- No plugin.output.dir override here — inherits ../mods-mvn from root pom -->
+    <!-- Bullet stays in mods-mvn because Player and Enemy depend on its BulletSPI -->
+    <!-- implementation being visible from the boot layer -->
 
     <dependencies>
         <dependency>

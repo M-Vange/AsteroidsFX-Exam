@@ -9,10 +9,9 @@
     <artifactId>Asteroids</artifactId>
     <packaging>jar</packaging>
 
-    <properties>
-        <!-- This is a plugin module, goes to plugins/ not mods-mvn/ -->
-        <plugin.output.dir>../plugins</plugin.output.dir>
-    </properties>
+    <!-- No plugin.output.dir override — goes to mods-mvn -->
+    <!-- Asteroids stays in boot layer because Collision depends on its -->
+    <!-- IAsteroidSplitter service at runtime to split/destroy asteroids -->
 
     <dependencies>
         <dependency>
