@@ -25,5 +25,12 @@
             <artifactId>CommonAsteroids</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- JUnit 5 for unit tests. test scope means it's only used during testing,
+             not included in the final jar -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
