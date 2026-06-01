@@ -11,17 +11,14 @@
     <artifactId>Core</artifactId>
     <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>Core</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <!-- Spring 6 requires Java 17 minimum -->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
-
-    <repositories>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -49,7 +46,14 @@
             <artifactId>CommonBullet</artifactId>
             <version>1.0.1-SNAPSHOT</version>
         </dependency>
+        <!-- Spring context pulls in spring-beans, spring-core, spring-aop,
+             spring-expression -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -63,6 +67,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <!-- Copy Spring JARs into mods-mvn so they are on the module path -->
                             <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,spring-context,spring-core,spring-beans,spring-aop,spring-expression,spring-jcl</includeArtifactIds>
                             <outputDirectory>../mods-mvn</outputDirectory>
                         </configuration>

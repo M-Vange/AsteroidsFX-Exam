@@ -5,6 +5,8 @@ import dk.sdu.mmmi.cbse.common.services.IGamePluginService;
 import dk.sdu.mmmi.cbse.common.services.IPostEntityProcessingService;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 
 import java.lang.module.Configuration;
 import java.lang.module.ModuleFinder;
@@ -22,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 public class Main extends Application {
 
     public static void main(String[] args) {
+
         launch(Main.class);
     }
 
@@ -64,9 +67,26 @@ public class Main extends Application {
             });
         }
 
-        // Start game with everything found
-        // Game constructor queries ServiceLocator to locate plugins inside "mods-mvn"
-        Game game = new Game(plugins, processors, postProcessors);
+        // Registering each service as a Spring bean. Spring then collects and dependency injects them
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+
+        for (int i = 0; i < plugins.size(); i++) {
+            context.getBeanFactory().registerSingleton("gamePlugin_" + i, plugins.get(i));
+        }
+        for (int i = 0; i < processors.size(); i++) {
+            context.getBeanFactory().registerSingleton("processor_" + i, processors.get(i));
+        }
+        for (int i = 0; i < postProcessors.size(); i++) {
+            context.getBeanFactory().registerSingleton("postProcessor_" + i, postProcessors.get(i));
+        }
+
+        // Register our configuration class and start the container
+        context.register(GameConfig.class);
+        context.refresh();
+
+
+        // Spring constructs Game and injects all service lists with @Bean method in GameConfig
+        Game game = context.getBean(Game.class);
 
         // Starts the GUI and boots game plugins
         game.start(window);
