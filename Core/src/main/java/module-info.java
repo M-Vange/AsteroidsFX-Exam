@@ -9,6 +9,8 @@ module Core {
     requires spring.context;
     requires spring.beans;
     requires spring.core;
+    // spring.web contains RestTemplate, which is used to call the ScoreService
+    requires spring.web;
 
     opens dk.sdu.mmmi.cbse.main to spring.core, spring.beans, spring.context;
 

@@ -31,20 +31,32 @@ class Game {
     private final Text gameOverText = new Text();
     private final Text restartText = new Text();
 
+    // ScoreClient talks to the ScoreService microservice to get the current score
+    private final ScoreClient scoreClient;
+
+    // Made into a field so update() can change the displayed score text
+    private Text scoreText;
+
+    // Counts game frames. Used so score updates once per second
+    private int scoreUpdateTimer = 0;
+
     private final List<IGamePluginService> gamePluginServices;
     private final List<IEntityProcessingService> entityProcessingServices;
     private final List<IPostEntityProcessingService> postEntityProcessingServices;
 
     public Game(List<IGamePluginService> gamePluginServices,
                 List<IEntityProcessingService> entityProcessingServices,
-                List<IPostEntityProcessingService> postEntityProcessingServices) {
+                List<IPostEntityProcessingService> postEntityProcessingServices,
+                ScoreClient scoreClient) {
         this.gamePluginServices = gamePluginServices;
         this.entityProcessingServices = entityProcessingServices;
         this.postEntityProcessingServices = postEntityProcessingServices;
+        // ScoreClient passed in by Spring via GameConfig
+        this.scoreClient = scoreClient;
     }
 
     public void start(Stage window) throws Exception {
-        Text scoreText = new Text(10, 25, "Destroyed asteroids: 0");
+        scoreText = new Text(10, 25, "Destroyed asteroids: 0");
         gameWindow.setPrefSize(gameData.getDisplayWidth(), gameData.getDisplayHeight());
         gameWindow.getChildren().add(scoreText);
 
@@ -198,6 +210,14 @@ class Game {
         }
         for (IPostEntityProcessingService postEntityProcessorService : getPostEntityProcessingServices()) {
             postEntityProcessorService.process(gameData, world);
+        }
+
+        // Update the score display roughly once per second
+        scoreUpdateTimer++;
+        if (scoreUpdateTimer >= 60) {
+            scoreUpdateTimer = 0;
+            int currentScore = scoreClient.getScore();
+            scoreText.setText("Destroyed asteroids: " + currentScore);
         }
     }
 

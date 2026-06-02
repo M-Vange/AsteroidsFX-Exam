@@ -60,6 +60,16 @@
                 <version>5.10.1</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-observation</artifactId>
+                <version>1.12.1</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-commons</artifactId>
+                <version>1.12.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -95,7 +105,7 @@
                         <argument>--class-path=libs/*</argument>
                         <!-- Force all modules in mods-mvn into the boot layer,
                              including CommonAsteroids and CommonBullet which are needed by the plugins -->
-                        <argument>--add-modules=ALL-MODULE-PATH</argument>
+                        <argument>--add-modules=ALL-MODULE-PATH,java.net.http</argument>
                         <argument>--module=Core/dk.sdu.mmmi.cbse.main.Main</argument>
                         <argument>--add-modules javafx.graphics</argument>
                     </arguments>
