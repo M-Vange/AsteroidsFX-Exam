@@ -7,6 +7,10 @@ import dk.sdu.mmmi.cbse.common.data.World;
 import dk.sdu.mmmi.cbse.common.asteroids.Asteroid;
 import dk.sdu.mmmi.cbse.common.asteroids.IAsteroidSplitter;
 import java.util.ServiceLoader;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class CollisionDetector implements IPostEntityProcessingService {
 
@@ -44,6 +48,9 @@ public class CollisionDetector implements IPostEntityProcessingService {
                         for (IAsteroidSplitter asteroidSplitter : ServiceLoader.load(IAsteroidSplitter.class)) {
                             asteroidSplitter.createSplitAsteroid(entity2, world);
                         }
+
+                        // Tell the ScoreService an asteroid was destroyed — score goes up by 1
+                        incrementScore();
                     }
 
                     // If player or enemy ship is hit by bullets a designated amount of times, destroy them.
@@ -81,6 +88,20 @@ public class CollisionDetector implements IPostEntityProcessingService {
         float dy = (float) entity1.getY() - (float) entity2.getY();
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
         return distance < (entity1.getRadius() + entity2.getRadius());
+    }
+
+    // Sends POST request to ScoreService to add 1 to score.
+    private void incrementScore() {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:8080/score/increment"))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build();
+            client.sendAsync(request, HttpResponse.BodyHandlers.discarding());
+        } catch (Exception e) {
+            // Score service not running — game continues without scoring
+        }
     }
 
 }

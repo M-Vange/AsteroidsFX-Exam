@@ -52,6 +52,19 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-commons</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -68,7 +81,7 @@
                         </goals>
                         <configuration>
                             <!-- Copy Spring JARs into mods-mvn so they are on the module path -->
-                            <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,spring-context,spring-core,spring-beans,spring-aop,spring-expression,spring-jcl</includeArtifactIds>
+                            <includeArtifactIds>javafx-controls,javafx-graphics,javafx-base,spring-context,spring-core,spring-beans,spring-aop,spring-expression,spring-jcl,spring-web,micrometer-observation,micrometer-commons</includeArtifactIds>
                             <outputDirectory>../mods-mvn</outputDirectory>
                         </configuration>
                     </execution>
